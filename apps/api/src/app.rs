@@ -27,7 +27,19 @@ pub async fn start(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
 
     let listener = tokio::net::TcpListener::bind(&address)
         .await
-        .map_err(|error| format!("cannot listen on {address}: {error} (is the hotspot up?)"))?;
+        .map_err(|error| {
+            let hint = match error.kind() {
+                std::io::ErrorKind::AddrInUse => {
+                    " (port already in use: is another quickshare running?)"
+                }
+                std::io::ErrorKind::AddrNotAvailable => {
+                    " (no interface has this address: is the hotspot up?)"
+                }
+                _ => "",
+            };
+
+            format!("cannot listen on {address}: {error}{hint}")
+        })?;
 
     tracing::info!(
         started = %log_timestamp(session.started_at()),

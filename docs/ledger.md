@@ -35,3 +35,9 @@ Dopo una revisione del primo impianto in vista dell'uso nel kit di estrazione:
 ## 2026-10-13 — Pipeline di release
 
 - Ripresa da Chemistry la pipeline Gitea: immagini CI (`docker/ci-*.Dockerfile`, `build-images.yml`), release su tag per Linux musl, Windows (cargo-xwin) e macOS arm64, `package-release.sh` e `publish-gitea-release.sh`. Differenze: l'archivio Linux include `serve.sh` e `hotspot.sh` (solo Linux, perché dipendono da NetworkManager e firewalld), e ogni job dichiara il workspace `safe.directory` perché il commit nel binario sia corretto anche nei container.
+
+## 2026-10-13 — Hotspot in WPA3
+
+- Valutata la cifratura dei file nel browser (ChaCha20-Poly1305 con la chiave nel fragment del QR): chiuderebbe l'ascolto passivo da parte di chi conosce la password del Wi-Fi, ma non un attacco attivo, perché la pagina stessa arriva in HTTP e può essere sostituita. Scelto invece di portare l'hotspot a WPA3 (SAE), che chiude lo stesso caso senza codice nell'app; ripiego automatico su WPA2 e opzione `--wpa2` per i telefoni vecchi. La cifratura nell'app resta da riconsiderare solo se servisse davvero.
+- `hotspot.sh` crea la connessione con `nmcli con add` invece di `nmcli dev wifi hotspot`, per poter scegliere sicurezza, PMF e cifrari.
+- Il messaggio di errore all'avvio distingue porta già occupata e indirizzo non disponibile.

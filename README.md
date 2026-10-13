@@ -38,6 +38,7 @@ Funziona con qualunque browser, iOS o Android: niente app, SMB, cavi o Debug USB
 - **Tracciabile.** Versione e commit sono compilati nel binario; l'hash dell'eseguibile in esecuzione compare nel terminale e in ogni registro.
 - **Accesso solo con il link.** Ogni avvio genera un token di sessione, contenuto nell'URL e nel QR code: chi è sull'hotspot ma non ha il link non può caricare nulla.
 - **Nessun file perso o alterato.** I nomi uguali vengono numerati (`report (1).pdf`) invece di sovrascrivere; gli invii interrotti vengono cancellati e annotati nel registro.
+- **Wi-Fi in WPA3.** `scripts/hotspot.sh` crea un hotspot WPA3 (SAE): anche chi conosce la password non può decifrare il traffico degli altri. WPA2 resta disponibile per i telefoni che non supportano WPA3.
 - **Firewall a parte.** `scripts/serve.sh` apre la porta su firewalld solo nella zona dell'hotspot e solo per la durata della sessione, poi la richiude; il binario non esegue `sudo` e non tocca il sistema.
 - **Un solo binario.** La pagina web è inclusa nell'eseguibile; la configurazione è facoltativa.
 
@@ -46,7 +47,7 @@ Funziona con qualunque browser, iOS o Android: niente app, SMB, cavi o Debug USB
 Requisiti per gli script: NetworkManager con `dnsmasq` (hotspot), `qrencode` facoltativo (QR del Wi-Fi), firewalld facoltativo.
 
 ```sh
-scripts/hotspot.sh start               # hotspot Wi-Fi: stampa SSID, password, IP e QR del Wi-Fi
+scripts/hotspot.sh start               # hotspot WPA3: stampa SSID, password, IP e QR del Wi-Fi (--wpa2 per telefoni vecchi)
 scripts/serve.sh                       # avvia sull'IP dell'hotspot (o della rete attiva), apre e poi richiude la porta
 quickshare --bind 10.42.0.1            # oppure direttamente, senza toccare il firewall
 ```
