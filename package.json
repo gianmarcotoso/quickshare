@@ -1,0 +1,26 @@
+{
+  "name": "quickshare",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "cd apps/api && cargo run",
+    "build": "node scripts/build.mjs",
+    "format": "prettier --write .",
+    "api-gen": "npm run api-gen --workspace=apps/web",
+    "format:check": "prettier --check .",
+    "lint": "npm run lint --workspace=apps/web"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.2",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0"
+  }
+}

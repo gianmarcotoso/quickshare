@@ -1,0 +1,54 @@
+{
+  "uploads": {
+    "description": "Scegli i file da inviare, controlla la selezione e premi Carica. L'impronta SHA-256 di ogni file viene calcolata su questo dispositivo e confrontata con quella del file ricevuto.",
+    "dropHere": "Trascina qui i file",
+    "dropDescription": "oppure sceglili dal dispositivo",
+    "choose": "Scegli i file",
+    "selected": "File selezionati",
+    "selectionSize_one": "{{count}} file, {{size}}",
+    "selectionSize_other": "{{count}} file, {{size}}",
+    "remove": "Rimuovi",
+    "clear": "Svuota",
+    "upload_one": "Carica {{count}} file",
+    "upload_other": "Carica {{count}} file",
+    "waitForCurrent": "Attendi la fine dell'invio in corso",
+    "batch": "Invio delle {{time}}",
+    "progress": "{{uploaded}} di {{total}} inviati",
+    "keepOpenTitle": "Tieni lo schermo acceso e questa pagina aperta",
+    "keepOpenDescription": "Se il telefono si blocca o passi a un'altra app, l'invio si interrompe e il file va inviato di nuovo.",
+    "hashing": "Calcolo {{progress}}",
+    "hashError": "Impossibile leggere il file per calcolare l'impronta",
+    "retry": "Riprova (torna tra i file selezionati)",
+    "batchError": "Impossibile avviare l'invio",
+    "uploadError": "Invio non riuscito",
+    "uploaded_one": "{{count}} file inviato",
+    "uploaded_other": "{{count}} file inviati",
+    "partiallyUploaded": "Inviati {{uploaded}} file su {{total}}",
+    "invalidLinkTitle": "Link non valido",
+    "invalidLinkDescription": "Apri la pagina dal QR code o dall'indirizzo completo mostrato sul computer che riceve i file.",
+    "status": {
+      "waiting": "In attesa",
+      "error": "Errore",
+      "done": "Inviato",
+      "verified": "Inviato e verificato",
+      "mismatch": "Impronta diversa"
+    }
+  },
+  "theme": {
+    "toggle": "Cambia tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "select": "Seleziona lingua"
+  },
+  "errors": {
+    "ERR_INTERNAL": "Errore inatteso del server",
+    "ERR_FILE_MISSING": "Nessun file ricevuto",
+    "ERR_FILE_TOO_LARGE": "Il file supera la dimensione massima consentita",
+    "ERR_UPLOAD_INTERRUPTED": "L'invio si è interrotto",
+    "ERR_INVALID_TOKEN": "Link non valido o scaduto: riapri la pagina dal QR code",
+    "ERR_BATCH_NOT_FOUND": "L'invio è già stato chiuso: ricarica i file"
+  }
+}

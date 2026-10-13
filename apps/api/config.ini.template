@@ -1,0 +1,12 @@
+[Server]
+Bind=127.0.0.1
+Port=3030
+
+[Storage]
+DataPath=./data
+
+[Upload]
+MaxBytes=0
+
+[Log]
+Level=info

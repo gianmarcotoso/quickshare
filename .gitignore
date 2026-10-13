@@ -1,0 +1,10 @@
+node_modules
+/apps/api/target
+/apps/web/dist
+/apps/web/src/api
+/build
+config.ini
+data
+.env
+.env.*
+!.env.local.example

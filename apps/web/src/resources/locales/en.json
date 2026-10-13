@@ -1,0 +1,54 @@
+{
+  "uploads": {
+    "description": "Choose the files to send, check the selection and press Upload. The SHA-256 fingerprint of each file is computed on this device and compared with the one of the received file.",
+    "dropHere": "Drop files here",
+    "dropDescription": "or choose them from your device",
+    "choose": "Choose files",
+    "selected": "Selected files",
+    "selectionSize_one": "{{count}} file, {{size}}",
+    "selectionSize_other": "{{count}} files, {{size}}",
+    "remove": "Remove",
+    "clear": "Clear",
+    "upload_one": "Upload {{count}} file",
+    "upload_other": "Upload {{count}} files",
+    "waitForCurrent": "Wait for the current upload to finish",
+    "batch": "Upload at {{time}}",
+    "progress": "{{uploaded}} of {{total}} sent",
+    "keepOpenTitle": "Keep the screen on and this page open",
+    "keepOpenDescription": "If the phone locks or you switch to another app, the upload stops and the file has to be sent again.",
+    "hashing": "Computing {{progress}}",
+    "hashError": "Cannot read the file to compute its fingerprint",
+    "retry": "Retry (moves it back to the selected files)",
+    "batchError": "Cannot start the upload",
+    "uploadError": "Upload failed",
+    "uploaded_one": "{{count}} file sent",
+    "uploaded_other": "{{count}} files sent",
+    "partiallyUploaded": "{{uploaded}} of {{total}} files sent",
+    "invalidLinkTitle": "Invalid link",
+    "invalidLinkDescription": "Open the page from the QR code or the full address shown on the computer receiving the files.",
+    "status": {
+      "waiting": "Waiting",
+      "error": "Error",
+      "done": "Sent",
+      "verified": "Sent and verified",
+      "mismatch": "Fingerprint mismatch"
+    }
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "select": "Select language"
+  },
+  "errors": {
+    "ERR_INTERNAL": "Unexpected server error",
+    "ERR_FILE_MISSING": "No file received",
+    "ERR_FILE_TOO_LARGE": "The file exceeds the maximum allowed size",
+    "ERR_UPLOAD_INTERRUPTED": "The upload was interrupted",
+    "ERR_INVALID_TOKEN": "Invalid or expired link: open the page again from the QR code",
+    "ERR_BATCH_NOT_FOUND": "The upload has already been closed: upload the files again"
+  }
+}

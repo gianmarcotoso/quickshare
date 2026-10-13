@@ -1,0 +1,6 @@
+dist
+node_modules
+apps/api/target
+apps/web/src/api
+apps/web/openapi.json
+*.md
