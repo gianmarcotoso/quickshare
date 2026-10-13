@@ -43,23 +43,16 @@ Funziona con qualunque browser, iOS o Android: niente app, SMB, cavi o Debug USB
 
 ## Uso
 
-```sh
-scripts/hotspot.sh start             # hotspot Wi-Fi: stampa SSID, password, IP e QR del Wi-Fi
-quickshare init                      # crea config.ini (facoltativo)
-```
-
-```ini
-[Server]
-Bind=10.42.0.1                       # IP dell'hotspot
-Port=3030
-```
+Requisiti per gli script: NetworkManager con `dnsmasq` (hotspot), `qrencode` facoltativo (QR del Wi-Fi), firewalld facoltativo.
 
 ```sh
-scripts/serve.sh config.ini          # apre la porta su firewalld, avvia, la richiude all'uscita
-quickshare                           # oppure direttamente, senza toccare il firewall
+scripts/hotspot.sh start               # hotspot Wi-Fi: stampa SSID, password, IP e QR del Wi-Fi
+scripts/serve.sh                       # avvia sull'IP dell'hotspot (o della rete attiva), apre e poi richiude la porta
+quickshare --bind 10.42.0.1            # oppure direttamente, senza toccare il firewall
 ```
 
 ```
+IP di ascolto: 10.42.0.1 (hotspot quickshare-hotspot)
 Porta 3030/tcp aperta nella zona nm-shared (wlp0s20f3), solo runtime.
 2026-10-13T17:01:12Z  INFO quickshare version="0.1.0 (3f2a9c1d0b7e)" executable_sha256=9ae31d45…
 2026-10-13T17:01:12Z  INFO session started started=2026-10-13T17:01:12Z (2026-10-13 19:01:12 +02:00) token=b2e92d97ff78fcba8396
@@ -83,6 +76,8 @@ head -n -1 quickshare.log | sha256sum   # deve coincidere con l'ultima riga del 
 ```
 
 ### Configurazione
+
+`--bind` e `--port` hanno la precedenza sul file; `quickshare init` crea un `config.ini` (facoltativo) per le altre impostazioni.
 
 | Chiave                        | Default              | Significato                                       |
 | ----------------------------- | -------------------- | ------------------------------------------------- |

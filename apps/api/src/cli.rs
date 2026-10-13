@@ -16,6 +16,12 @@ pub struct Cli {
     )]
     pub config: PathBuf,
 
+    #[arg(long, help = "Listen address, overrides Server.Bind")]
+    pub bind: Option<String>,
+
+    #[arg(long, help = "Listen port, overrides Server.Port")]
+    pub port: Option<u16>,
+
     #[command(subcommand)]
     pub command: Option<Command>,
 }

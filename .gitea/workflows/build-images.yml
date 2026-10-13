@@ -1,0 +1,37 @@
+name: Build CI toolchain images
+
+on:
+    push:
+        branches: [master]
+        paths:
+            - 'docker/ci-*.Dockerfile'
+            - '.gitea/workflows/build-images.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    build:
+        runs-on: ubuntu-24.04
+        strategy:
+            matrix:
+                include:
+                    - name: linux
+                      dockerfile: docker/ci-linux-build.Dockerfile
+                    - name: windows
+                      dockerfile: docker/ci-windows-build.Dockerfile
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Login al Container Registry di Gitea
+              run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login gitea.polarityb.it -u gianmarcotoso --password-stdin
+
+            - name: Build e push
+              run: |
+                  set -euo pipefail
+                  image="gitea.polarityb.it/${{ github.repository_owner }}/quickshare-ci-${{ matrix.name }}"
+                  docker build -t "$image:latest" -t "$image:${{ github.sha }}" -f "${{ matrix.dockerfile }}" docker
+                  docker push "$image:latest"
+                  docker push "$image:${{ github.sha }}"

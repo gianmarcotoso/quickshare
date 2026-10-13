@@ -7,13 +7,33 @@ set -euo pipefail
 CON=quickshare-hotspot
 SSID="${QUICKSHARE_SSID:-QUICKSHARE}"
 
+WORDS=(
+  acqua albero alba ancora anello aquila arancia argento autunno balena barca bosco bottone
+  brezza bussola campo candela canto carta castello cavallo cielo ciliegia cipresso collina
+  coniglio corda cortile cuscino delfino diamante duna edera estate falco farfalla faro
+  fiume foglia fontana formica fragola fulmine gabbiano gatto gelato ghianda giardino girasole
+  gomitolo grano grotta isola lago lampada lanterna lepre limone luna lupo mandorla mare
+  margherita matita melone miele mirtillo montagna mulino neve nido nocciola nuvola oliva
+  onda orso ortica pane panda passero pesca pietra pigna pino pioggia piuma ponte porto
+  prato quercia radice rana riccio rondine rosa sabbia sasso scoglio seme sentiero sole
+  stella tamburo tigre torre treno trifoglio tulipano uva valle vento vela viola volpe zucca
+)
+
 die() { echo "ERRORE: $*" >&2; exit 1; }
+
+random_word() {
+  local n
+  n="$(od -An -N4 -tu4 /dev/urandom)"
+  echo "${WORDS[$(( ${n// /} % ${#WORDS[@]} ))]}"
+}
 
 case "${1:-}" in
   start)
-    ifc="${2:-$(nmcli -t -f DEVICE,TYPE dev | awk -F: '$2=="wifi"{print $1; exit}')}"
+    command -v dnsmasq >/dev/null ||
+      die "dnsmasq non installato: NetworkManager lo usa per assegnare gli IP ai dispositivi (sudo pacman -S dnsmasq)"
+    ifc="${2:-$(nmcli -t -f DEVICE,TYPE dev | awk -F: '!found && $2=="wifi" {print $1; found=1}')}"
     [[ -n "$ifc" ]] || die "nessuna interfaccia Wi-Fi trovata"
-    pw="$(tr -dc 'a-km-z2-9' </dev/urandom | head -c 12)"
+    pw="$(random_word)-$(random_word)"
     nmcli con delete "$CON" >/dev/null 2>&1 || true
     nmcli dev wifi hotspot ifname "$ifc" con-name "$CON" ssid "$SSID" password "$pw" >/dev/null
     sleep 2
@@ -21,8 +41,11 @@ case "${1:-}" in
     echo "Hotspot attivo su $ifc"
     echo "  SSID:     $SSID"
     echo "  Password: $pw"
-    echo "  IP:       $ip   (in config.ini: [Server] Bind=$ip)"
-    command -v qrencode >/dev/null && qrencode -t ansiutf8 "WIFI:T:WPA;S:$SSID;P:$pw;;"
+    echo "  IP:       $ip"
+    echo "Avvio:      scripts/serve.sh"
+    if command -v qrencode >/dev/null; then
+      qrencode -t ansiutf8 "WIFI:T:WPA;S:$SSID;P:$pw;;"
+    fi
     ;;
   stop)
     nmcli con down "$CON" >/dev/null 2>&1 || true

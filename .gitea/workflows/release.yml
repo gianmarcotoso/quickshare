@@ -1,0 +1,126 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - 'v*'
+
+permissions:
+    contents: write
+    packages: read
+
+jobs:
+    check-version:
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+            - shell: bash
+              run: |
+                  set -euo pipefail
+                  tag_version="${GITHUB_REF_NAME#v}"
+                  cargo_version="$(grep -m1 '^version' apps/api/Cargo.toml | cut -d '"' -f2)"
+                  if [ "$tag_version" != "$cargo_version" ]; then
+                    echo "Tag $GITHUB_REF_NAME (versione $tag_version) non corrisponde ad apps/api/Cargo.toml ($cargo_version)." >&2
+                    exit 1
+                  fi
+
+    build-linux:
+        needs: check-version
+        runs-on: ubuntu-24.04
+        container:
+            image: gitea.polarityb.it/${{ github.repository_owner }}/quickshare-ci-linux:latest
+            credentials:
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: actions/checkout@v4
+            - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      /usr/local/cargo/registry
+                      apps/api/target
+                  key: cargo-linux-${{ hashFiles('apps/api/Cargo.lock') }}
+                  restore-keys: cargo-linux-
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: npm-${{ hashFiles('package-lock.json') }}
+                  restore-keys: npm-
+            - run: npm ci
+            - run: npm run build -- --target x86_64-unknown-linux-musl
+            - run: bash scripts/package-release.sh apps/api/target/x86_64-unknown-linux-musl/release/quickshare linux-x86_64
+            - name: Pubblica su Gitea Release
+              shell: bash
+              env:
+                  GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  TAG: ${{ github.ref_name }}
+                  API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+              run: bash scripts/publish-gitea-release.sh build/linux-x86_64
+
+    build-windows:
+        needs: check-version
+        runs-on: ubuntu-24.04
+        container:
+            image: gitea.polarityb.it/${{ github.repository_owner }}/quickshare-ci-windows:latest
+            credentials:
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+        env:
+            XWIN_ACCEPT_LICENSE: '1'
+        steps:
+            - uses: actions/checkout@v4
+            - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      /usr/local/cargo/registry
+                      apps/api/target
+                  key: cargo-windows-${{ hashFiles('apps/api/Cargo.lock') }}
+                  restore-keys: cargo-windows-
+            - uses: actions/cache@v4
+              with:
+                  path: /xwin-cache
+                  key: xwin-cache
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: npm-${{ hashFiles('package-lock.json') }}
+                  restore-keys: npm-
+            - run: npm ci
+            - run: npm run build -- --target x86_64-pc-windows-msvc --xwin
+            - run: bash scripts/package-release.sh apps/api/target/x86_64-pc-windows-msvc/release/quickshare.exe windows-x86_64
+            - name: Pubblica su Gitea Release
+              shell: bash
+              env:
+                  GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  TAG: ${{ github.ref_name }}
+                  API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+              run: bash scripts/publish-gitea-release.sh build/windows-x86_64
+
+    build-macos:
+        needs: check-version
+        runs-on: macos-arm64
+        steps:
+            - uses: actions/checkout@v4
+            - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/registry
+                  key: cargo-registry-macos-${{ hashFiles('apps/api/Cargo.lock') }}
+                  restore-keys: cargo-registry-macos-
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: npm-${{ hashFiles('package-lock.json') }}
+                  restore-keys: npm-
+            - run: npm ci
+            - run: npm run build
+            - run: bash scripts/package-release.sh apps/api/target/release/quickshare macos-arm64
+            - name: Pubblica su Gitea Release
+              shell: bash
+              env:
+                  GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  TAG: ${{ github.ref_name }}
+                  API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+              run: bash scripts/publish-gitea-release.sh build/macos-arm64

@@ -24,7 +24,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
         Some(command) => cli::run(&cli.config, command),
         None => {
-            let config = AppConfig::load(&cli.config)?;
+            let mut config = AppConfig::load(&cli.config)?;
+
+            if let Some(bind) = cli.bind {
+                config.bind = bind;
+            }
+
+            if let Some(port) = cli.port {
+                config.port = port;
+            }
+
             init_logging(&config.log_level);
 
             let executable_sha256 = sha256_file(&std::env::current_exe()?)?;

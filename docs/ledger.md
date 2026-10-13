@@ -30,3 +30,8 @@ Dopo una revisione del primo impianto in vista dell'uso nel kit di estrazione:
 
 - L'apertura e la chiusura della porta su firewalld escono dal binario e passano a `scripts/serve.sh`, che avvia quickshare in mezzo. Il binario resta un server di file che non esegue `sudo` né modifica il sistema; la gestione del firewall, specifica della postazione, è uno script che si legge in un colpo d'occhio.
 - Aggiunto `scripts/hotspot.sh`, ripreso dal kit di estrazione e reso autonomo (connessione `quickshare-hotspot`, SSID configurabile), così quickshare si usa anche senza il kit.
+- `quickshare` accetta `--bind` e `--port` (precedenza sul config); `scripts/serve.sh` ricava da solo l'IP di ascolto (hotspot di quickshare se attivo, altrimenti la rete della rotta di default) e lo passa come `--bind`, così non serve scrivere l'IP nel config a ogni sessione.
+
+## 2026-10-13 — Pipeline di release
+
+- Ripresa da Chemistry la pipeline Gitea: immagini CI (`docker/ci-*.Dockerfile`, `build-images.yml`), release su tag per Linux musl, Windows (cargo-xwin) e macOS arm64, `package-release.sh` e `publish-gitea-release.sh`. Differenze: l'archivio Linux include `serve.sh` e `hotspot.sh` (solo Linux, perché dipendono da NetworkManager e firewalld), e ogni job dichiara il workspace `safe.directory` perché il commit nel binario sia corretto anche nei container.

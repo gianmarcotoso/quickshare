@@ -20,7 +20,7 @@ Workspace npm (`apps/*`), come Chemistry:
 
 ## Configurazione
 
-`config.ini`, percorso da `--config` o variabile `QUICKSHARE_CONFIG` (default `./config.ini`). Il file è facoltativo: se manca valgono i default. `quickshare init` lo scrive dal template `apps/api/config.ini.template`.
+`config.ini`, percorso da `--config` o variabile `QUICKSHARE_CONFIG` (default `./config.ini`). Il file è facoltativo: se manca valgono i default. `--bind` e `--port` hanno la precedenza su `Server.Bind` e `Server.Port`, così si può avviare sull'IP dell'hotspot senza toccare il config. `quickshare init` lo scrive dal template `apps/api/config.ini.template`.
 
 | Chiave                        | Default              | Significato                                                     |
 | ----------------------------- | -------------------- | --------------------------------------------------------------- |
@@ -37,13 +37,19 @@ Ogni avvio è una **sessione**: un token casuale (10 byte, esadecimale) generato
 
 ## Hotspot
 
-`scripts/hotspot.sh start [interfaccia] | stop | stato`, ripreso dal kit di estrazione: crea con NetworkManager una connessione `quickshare-hotspot` sulla prima interfaccia Wi-Fi (o su quella indicata), con SSID `QUICKSHARE` (o `QUICKSHARE_SSID`) e una password casuale di 12 caratteri senza simboli ambigui, e stampa SSID, password, IP da mettere in `Server.Bind` e, se c'è `qrencode`, il QR code per collegarsi al Wi-Fi. Avviandolo la scheda Wi-Fi lascia la rete attuale; `stop` elimina la connessione e NetworkManager torna alla rete abituale. NetworkManager assegna di solito lo stesso IP (`10.42.0.1`), quindi `Bind` in genere non cambia tra un avvio e l'altro.
+`scripts/hotspot.sh start [interfaccia] | stop | stato`, ripreso dal kit di estrazione: crea con NetworkManager una connessione `quickshare-hotspot` sulla prima interfaccia Wi-Fi (o su quella indicata), con SSID `QUICKSHARE` (o `QUICKSHARE_SSID`) e una password di due parole italiane separate da un trattino (es. `barca-riccio`, scelte a caso tra 115 con `/dev/urandom`), facile da dettare, e stampa SSID, password, IP, il comando di avvio (`scripts/serve.sh`, che userà da solo l'IP dell'hotspot) e, se c'è `qrencode`, il QR code per collegarsi al Wi-Fi. Serve `dnsmasq` installato (NetworkManager lo usa per il DHCP della connessione condivisa; senza, l'attivazione fallisce con "IP configuration could not be reserved"): lo script lo controlla prima di partire. Non serve `sudo`: NetworkManager autorizza l'utente della sessione. Avviandolo la scheda Wi-Fi lascia la rete attuale; `stop` elimina la connessione e NetworkManager torna alla rete abituale. NetworkManager assegna di solito lo stesso IP (`10.42.0.1`).
 
 Sequenza tipica: `scripts/hotspot.sh start`, il cliente inquadra il QR del Wi-Fi, `scripts/serve.sh`, il cliente inquadra il QR di quickshare, poi Ctrl+C e `scripts/hotspot.sh stop`.
 
 ## Firewall
 
-Il binario non tocca il firewall. Lo fa `scripts/serve.sh [config.ini] [binario]`, che avvia quickshare dopo aver aperto la porta: se firewalld è attivo e `Server.Bind` è un IP non di loopback, trova l'interfaccia con quell'IP e la sua zona (`firewall-cmd --get-zone-of-interface`, o la zona di default) e apre la porta solo in quella zona e solo a runtime (`sudo firewall-cmd --zone=<zona> --add-port=<porta>/tcp`, senza `--permanent`), come faceva lo script SMB del kit di estrazione. Quando quickshare termina (Ctrl+C) la richiude con un `trap` su `EXIT`. Se la porta era già aperta non la tocca e non la chiude; con `Bind=0.0.0.0` non apre nulla e lo segnala; se nessuna interfaccia ha l'IP di `Bind` si ferma prima di avviare. Il binario va passato come secondo argomento, o con `QUICKSHARE_BIN`, altrimenti si cerca `quickshare` nel `PATH` e poi `./quickshare`. Una regola runtime sopravvissuta a un crash sparisce comunque al riavvio di firewalld.
+Il binario non tocca il firewall. Lo fa `scripts/serve.sh [--config <file>] [--bind <ip>] [--port <porta>]`, che avvia quickshare passandogli le stesse opzioni.
+
+- **IP di ascolto.** Se non c'è `--bind`, lo script lo trova da solo e lo passa a quickshare come `--bind`: prima l'IP della connessione `quickshare-hotspot` se è attiva (`nmcli -g IP4.ADDRESS`), altrimenti l'IP sorgente della rotta di default (`ip route get 1.1.1.1`), cioè la rete a cui la macchina è collegata. Stampa quale ha scelto e perché; se non trova nulla si ferma. `Server.Bind` del config viene quindi ignorato quando si usa lo script; la porta viene da `--port`, poi da `Server.Port`, poi `3030`.
+- **Porta.** Se firewalld è attivo e l'IP non è di loopback, trova l'interfaccia con quell'IP e la sua zona (`firewall-cmd --get-zone-of-interface`, o la zona di default) e apre la porta solo in quella zona e solo a runtime (`sudo firewall-cmd --zone=<zona> --add-port=<porta>/tcp`, senza `--permanent`), come faceva lo script SMB del kit di estrazione. Quando quickshare termina (Ctrl+C) la richiude con un `trap` su `EXIT`. Se la porta era già aperta non la tocca e non la chiude; con `--bind 0.0.0.0` non apre nulla e lo segnala.
+- Il binario si indica con `QUICKSHARE_BIN`, altrimenti si cerca `quickshare` nel `PATH` e poi `./quickshare`.
+
+Una regola runtime sopravvissuta a un crash sparisce comunque al riavvio di firewalld.
 
 ## Layout su disco
 
@@ -113,8 +119,8 @@ Ctrl+C (o SIGTERM) smette di accettare connessioni e aspetta fino a 5 secondi gl
 ## CLI
 
 ```
-quickshare [--config <path>]   # avvia il server
-scripts/serve.sh [config] [bin] # lo avvia aprendo e poi richiudendo la porta su firewalld
+quickshare [--config <path>] [--bind <ip>] [--port <porta>]   # avvia il server
+scripts/serve.sh [stesse opzioni]   # lo avvia aprendo e poi richiudendo la porta su firewalld
 quickshare --version           # versione e commit, es. 0.1.0 (3f2a9c1d0b7e)
 quickshare init                # scrive un config.ini dal template (non sovrascrive)
 quickshare openapi             # stampa lo spec OpenAPI su stdout
@@ -123,5 +129,31 @@ quickshare openapi             # stampa lo spec OpenAPI su stdout
 ## Distribuzione
 
 Un'installazione è il binario `quickshare` (pagina inclusa) ed eventualmente `config.ini`. `scripts/build.mjs` fa la build da zero come in Chemistry: cancella `apps/web/dist`, compila il server per la piattaforma della build, ne prende lo spec (`quickshare openapi`) per generare il client orval, compila la pagina, ricompila il crate per la piattaforma di destinazione così da includere la pagina aggiornata. Il binario è in `apps/api/target/release/` (o `target/<triple>/release/`).
+
+**Release** (`.gitea/workflows/release.yml`, ripresa da Chemistry): al push di un tag `v<versione>`, che deve coincidere con `version` di `apps/api/Cargo.toml` (unica fonte della versione), tre job compilano in parallelo e allegano l'archivio alla Release Gitea del tag (`scripts/publish-gitea-release.sh`, idempotente: un asset con lo stesso nome viene sostituito):
+
+| Job | Dove | Target | Archivio |
+| --- | --- | --- | --- |
+| `build-linux` | container `quickshare-ci-linux` | `x86_64-unknown-linux-musl` (statico) | `quickshare-<versione>-linux-x86_64.tar.gz`, con `serve.sh` e `hotspot.sh` |
+| `build-windows` | container `quickshare-ci-windows` | `x86_64-pc-windows-msvc` con cargo-xwin | `quickshare-<versione>-windows-x86_64.zip` |
+| `build-macos` | runner self-hosted `macos-arm64`, senza container | nativo arm64 | `quickshare-<versione>-macos-arm64.tar.gz` |
+
+`scripts/package-release.sh <binario> <piattaforma>` crea l'archivio in `build/<piattaforma>/`. Gli script stanno solo nell'archivio Linux, accanto al binario, perché usano NetworkManager, firewalld e `ip`; `serve.sh` cerca il binario prima nella propria cartella. Ogni job fa `git config --global --add safe.directory` prima della build: nei container il checkout ha un proprietario diverso dall'utente, git rifiuterebbe il repository e `build.rs` scriverebbe `unknown` al posto del commit. Le immagini dei container (`docker/ci-*.Dockerfile`: Ubuntu, Node, Rust stable con i target) sono costruite e pubblicate nel registry di Gitea da `.gitea/workflows/build-images.yml` quando cambiano i Dockerfile, con il secret `REGISTRY_TOKEN`.
+
+**Build in locale con l'immagine CI**, per provare l'archivio Linux senza passare da Gitea (`.tmp/` è ignorata da git):
+
+```sh
+docker build -t quickshare-ci-linux -f docker/ci-linux-build.Dockerfile docker
+rsync -a --delete --exclude node_modules --exclude target --exclude dist --exclude apps/web/src/api \
+  --exclude .tmp --exclude build --exclude data --exclude config.ini ./ .tmp/src/
+docker run --rm -v "$PWD/.tmp/src:/work" -w /work quickshare-ci-linux bash -c '
+  git config --global --add safe.directory /work && npm ci &&
+  npm run build -- --target x86_64-unknown-linux-musl &&
+  bash scripts/package-release.sh apps/api/target/x86_64-unknown-linux-musl/release/quickshare linux-x86_64 &&
+  chown -R '"$(id -u):$(id -g)"' /work'
+tar -xzf .tmp/src/build/linux-x86_64/quickshare-*-linux-x86_64.tar.gz -C .tmp
+```
+
+La copia in `.tmp/src` evita che il container, che lavora come root, lasci file di root in `node_modules` e `target` del repository.
 
 **Versione e commit.** `build.rs` legge il commit con `git rev-parse --short=12 HEAD` e aggiunge `-dirty` se `git status --porcelain` non è vuoto (`unknown` fuori da un repository o prima del primo commit); la versione completa (`0.1.0 (3f2a9c1d0b7e)`) è in `--version`, nel terminale, nei registri e nel piè di pagina. Lo script di build ricompila sempre il crate, quindi il commit (e il `-dirty`) di un binario di produzione è sempre esatto; in sviluppo il build script si riesegue solo quando cambiano `.git/HEAD` o `.git/index`. Per un uso in tribunale: binario compilato da un commit pulito, hash dell'eseguibile nel verbale (lo stesso che compare nell'intestazione di ogni registro), sorgente e test disponibili.
