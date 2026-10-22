@@ -41,3 +41,7 @@ Dopo una revisione del primo impianto in vista dell'uso nel kit di estrazione:
 - Valutata la cifratura dei file nel browser (ChaCha20-Poly1305 con la chiave nel fragment del QR): chiuderebbe l'ascolto passivo da parte di chi conosce la password del Wi-Fi, ma non un attacco attivo, perché la pagina stessa arriva in HTTP e può essere sostituita. Scelto invece di portare l'hotspot a WPA3 (SAE), che chiude lo stesso caso senza codice nell'app; ripiego automatico su WPA2 e opzione `--wpa2` per i telefoni vecchi. La cifratura nell'app resta da riconsiderare solo se servisse davvero.
 - `hotspot.sh` crea la connessione con `nmcli con add` invece di `nmcli dev wifi hotspot`, per poter scegliere sicurezza, PMF e cifrari.
 - Il messaggio di errore all'avvio distingue porta già occupata e indirizzo non disponibile.
+
+## 2026-10-22 — Licenza
+
+- Progetto rilasciato sotto GPL-3.0 (`GPL-3.0-only`): testo in `LICENSE`, campo `license` in `Cargo.toml` e nei `package.json`.
