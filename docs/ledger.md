@@ -45,3 +45,15 @@ Dopo una revisione del primo impianto in vista dell'uso nel kit di estrazione:
 ## 2026-10-22 — Licenza
 
 - Progetto rilasciato sotto GPL-3.0 (`GPL-3.0-only`): testo in `LICENSE`, campo `license` in `Cargo.toml` e nei `package.json`.
+
+## 2026-10-22 — Allineamento alle convenzioni
+
+Giro di verifica con `check-conventions.py` su tutto l'albero; hook `Stop` attivato in `.claude/settings.local.json`.
+
+- Azioni e lib con una sola funzione per file: `finish_batch`, `save_file`, `write_field` diventano azioni a sé; `numbered_file_name`, `truncate_file_name`, `http_url` lib generiche; `received_file_log_entry` in `features/uploads/libs/`, perché serve solo a questa feature.
+- Il controller di invio non cerca più il lotto né costruisce errori: lo fa l'azione `receive_file`. `Uploader` diventa un extractor e i controller non toccano più `ConnectInfo` e header.
+- `require_token` in `middlewares/` risponde direttamente con `401` + `ErrorDto`; tolta la variante `ActionError::Unauthorized`, rimasta inutilizzata.
+- `Batch` e `PartialFile` escono da `types/` come componenti con ciclo di vita; costanti della feature in `constants.rs`.
+- Frontend: utility del tema in `lib/`, contesto in `contexts/theme-context.ts`, `useTheme` in `hooks/` (via l'`eslint-disable`); classi Tailwind arbitrarie sostituite da `size-5` e `tracking-tight`.
+- `ActionError::internal` logga la causa alla creazione e porta un `ErrorDto`, come in nostromo.
+- Tolto `ReceivedFile::is_renamed`: il confronto tra nome salvato e originale sta dove serve, così `types/` resta senza eccezioni.

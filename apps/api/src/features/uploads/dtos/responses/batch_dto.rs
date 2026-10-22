@@ -1,7 +1,7 @@
 use serde::Serialize;
 use utoipa::ToSchema;
 
-use crate::features::uploads::types::batch::Batch;
+use crate::features::uploads::batch::Batch;
 
 #[derive(Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]

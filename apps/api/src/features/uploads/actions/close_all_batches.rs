@@ -1,4 +1,4 @@
-use crate::{app::state::AppState, features::uploads::actions::close_batch::finish_batch};
+use crate::{app::state::AppState, features::uploads::actions::finish_batch::finish_batch};
 
 pub fn close_all_batches(state: &AppState) {
     let batches: Vec<_> = state

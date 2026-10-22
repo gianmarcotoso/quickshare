@@ -1,17 +1,12 @@
-use std::net::SocketAddr;
-
 use axum::{
     Json,
-    extract::{ConnectInfo, Multipart, Path, State},
-    http::{HeaderMap, StatusCode},
+    extract::{Multipart, Path, State},
+    http::StatusCode,
 };
 
 use crate::{
     app::state::AppState,
-    core::{
-        action_error::ActionError,
-        error_code::{ErrorCode, ErrorDto},
-    },
+    core::{action_error::ActionError, error_code::ErrorDto},
     features::uploads::{
         actions::{
             close_batch::close_batch, create_batch::create_batch, receive_file::receive_file,
@@ -23,8 +18,6 @@ use crate::{
         types::uploader::Uploader,
     },
 };
-
-const FILE_FIELD: &str = "file";
 
 #[utoipa::path(
     post,
@@ -39,10 +32,9 @@ const FILE_FIELD: &str = "file";
 )]
 pub async fn create(
     State(state): State<AppState>,
-    ConnectInfo(address): ConnectInfo<SocketAddr>,
-    headers: HeaderMap,
+    uploader: Uploader,
 ) -> Result<(StatusCode, Json<BatchDto>), ActionError> {
-    let batch = create_batch(&state, &Uploader::from_request(address, &headers))?;
+    let batch = create_batch(&state, &uploader)?;
 
     Ok((StatusCode::CREATED, Json(batch.as_ref().into())))
 }
@@ -66,27 +58,12 @@ pub async fn create(
 pub async fn upload(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    ConnectInfo(address): ConnectInfo<SocketAddr>,
-    headers: HeaderMap,
-    mut multipart: Multipart,
+    uploader: Uploader,
+    multipart: Multipart,
 ) -> Result<(StatusCode, Json<ReceivedFileDto>), ActionError> {
-    let batch = state
-        .session()
-        .batches()
-        .get(&id)
-        .cloned()
-        .ok_or(ActionError::NotFound(ErrorCode::BatchNotFound))?;
+    let received = receive_file(&state, &id, multipart, uploader).await?;
 
-    while let Some(field) = multipart.next_field().await? {
-        if field.name() == Some(FILE_FIELD) {
-            let received =
-                receive_file(batch, field, Uploader::from_request(address, &headers)).await?;
-
-            return Ok((StatusCode::CREATED, Json(received.into())));
-        }
-    }
-
-    Err(ActionError::LogicViolation(ErrorCode::FileMissing))
+    Ok((StatusCode::CREATED, Json(received.into())))
 }
 
 #[utoipa::path(

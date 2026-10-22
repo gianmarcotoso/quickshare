@@ -10,9 +10,3 @@ pub struct ReceivedFile {
     pub received_at: DateTime<Utc>,
     pub uploader: Uploader,
 }
-
-impl ReceivedFile {
-    pub fn is_renamed(&self) -> bool {
-        self.name != self.original_name
-    }
-}

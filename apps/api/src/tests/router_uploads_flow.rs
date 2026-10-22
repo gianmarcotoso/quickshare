@@ -5,7 +5,7 @@ use axum::{
 use sha2::{Digest, Sha256};
 
 use crate::{
-    features::uploads::types::batch::BATCH_LOG,
+    features::uploads::constants::BATCH_LOG,
     tests::support::{json, multipart_body, test_app},
 };
 

@@ -2,7 +2,7 @@
 
 Pagina di invio: React 19 + TypeScript, Vite (con React Compiler), Tailwind 4, componenti shadcn (stile `new-york`), TanStack Query, axios, client orval, Redux Toolkit (lingua), i18next (it/en), react-hot-toast, hash-wasm. Componenti e struttura del tema sono quelli di Chemistry (`index.css`, `components/ui`, `ThemeSwitch`, `LanguageSwitch`, `ActionButton`, `WithTooltip`); non ci sono router, form né tabelle perché c'è una sola pagina.
 
-**Identità.** I colori vengono dall'icona: primario blu `#2f6fe0` (in tema scuro `#6c9cff`), inchiostro `#16181d`, fondo scuro `#14161a`, neutri freddi; successo, avviso e info restano quelli di Chemistry. Il logotipo nell'header è il testo `quickshare` in Space Grotesk 600 con tracking `-0.03em` (`@fontsource/space-grotesk`, `font-display`) accanto a `assets/quickshare-icon.svg`: i `logo-*.svg` non si usano nella pagina perché un SVG caricato come immagine non vede i font della pagina. `public/` contiene le icone del pacchetto (`favicon.svg` con tratti ispessiti per 16/32 px, PNG 16/32/48, `apple-touch-icon.png`, icone PWA normali e maskable) e `site.webmanifest`, tutti con percorsi relativi. Gli SVG originali (con i metadati C2PA) sono anche in `docs/assets/`, usati dal README.
+**Identità.** I colori vengono dall'icona: primario blu `#2f6fe0` (in tema scuro `#6c9cff`), inchiostro `#16181d`, fondo scuro `#14161a`, neutri freddi; successo, avviso e info restano quelli di Chemistry. Il logotipo nell'header è il testo `quickshare` in Space Grotesk 600 con `tracking-tight` (`@fontsource/space-grotesk`, `font-display`) accanto a `assets/quickshare-icon.svg`: i `logo-*.svg` non si usano nella pagina perché un SVG caricato come immagine non vede i font della pagina. `public/` contiene le icone del pacchetto (`favicon.svg` con tratti ispessiti per 16/32 px, PNG 16/32/48, `apple-touch-icon.png`, icone PWA normali e maskable) e `site.webmanifest`, tutti con percorsi relativi. Gli SVG originali (con i metadati C2PA) sono anche in `docs/assets/`, usati dal README.
 
 ## Struttura
 
@@ -20,10 +20,11 @@ src/
   api/                               # GENERATO da orval — non modificare a mano
   assets/quickshare-icon.svg
   components/                        # header, progress-bar, app-version, switch di tema e lingua; ui/ = shadcn
-  contexts/theme-provider.tsx
+  contexts/                          # theme-context.ts (tipi e contesto), theme-provider.tsx
+  hooks/use-theme.hook.ts
   core/                              # http.ts (axios con il token, mutator orval), app-config.ts (versione, token da ?t=), i18n.ts
   store/                             # Redux Toolkit: slice language
-  lib/                               # format, errori, utils
+  lib/                               # format, errori, utils, tema di sistema e applicazione al documento
   resources/locales/{it,en}.json
 ```
 

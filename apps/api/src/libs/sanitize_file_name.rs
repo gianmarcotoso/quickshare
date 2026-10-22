@@ -1,3 +1,5 @@
+use crate::libs::truncate_file_name::truncate_file_name;
+
 const FALLBACK_NAME: &str = "file";
 const MAX_NAME_BYTES: usize = 200;
 const RESERVED_CHARACTERS: &[char] = &['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
@@ -22,27 +24,7 @@ pub fn sanitize_file_name(name: &str) -> String {
         return FALLBACK_NAME.to_string();
     }
 
-    truncate(trimmed, MAX_NAME_BYTES)
-}
-
-fn truncate(name: &str, max_bytes: usize) -> String {
-    if name.len() <= max_bytes {
-        return name.to_string();
-    }
-
-    let (stem, extension) = match name.rsplit_once('.') {
-        Some((stem, extension)) if !stem.is_empty() && extension.len() < max_bytes / 2 => {
-            (stem, format!(".{extension}"))
-        }
-        _ => (name, String::new()),
-    };
-
-    let mut end = max_bytes - extension.len();
-    while !stem.is_char_boundary(end) {
-        end -= 1;
-    }
-
-    format!("{}{extension}", &stem[..end])
+    truncate_file_name(trimmed, MAX_NAME_BYTES)
 }
 
 #[cfg(test)]

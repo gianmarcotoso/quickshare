@@ -11,7 +11,7 @@ use crate::{
     core::app_config::API_PATH,
     features::uploads::{
         controllers::{batches as batches_controller, session as session_controller},
-        middleware::require_token,
+        middlewares::require_token::require_token,
     },
     openapi::{ApiDoc, OPENAPI_PATH},
 };

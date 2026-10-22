@@ -7,7 +7,7 @@ export function Header() {
 		<header className="flex items-center justify-between gap-4 py-4">
 			<div className="flex items-center gap-3">
 				<QuickShareIcon className="size-9" />
-				<h1 className="font-display text-2xl font-semibold tracking-[-0.03em]">quickshare</h1>
+				<h1 className="font-display text-2xl font-semibold tracking-tight">quickshare</h1>
 			</div>
 			<div className="flex items-center">
 				<LanguageSwitch />

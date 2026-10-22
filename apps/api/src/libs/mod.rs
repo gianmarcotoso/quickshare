@@ -1,7 +1,10 @@
 pub mod describe_device;
 pub mod format_bytes;
+pub mod http_url;
 pub mod log_timestamp;
 pub mod network_urls;
+pub mod numbered_file_name;
 pub mod sanitize_file_name;
 pub mod sha256_file;
 pub mod terminal_qr;
+pub mod truncate_file_name;

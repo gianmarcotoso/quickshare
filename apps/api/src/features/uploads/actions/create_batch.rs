@@ -5,8 +5,8 @@ use chrono::Utc;
 use crate::{
     app::state::AppState,
     core::{action_error::ActionError, version::VERSION},
-    features::uploads::types::{batch::Batch, uploader::Uploader},
-    libs::log_timestamp::log_timestamp,
+    features::uploads::{batch::Batch, types::uploader::Uploader},
+    libs::{describe_device::describe_device, log_timestamp::log_timestamp},
 };
 
 pub fn create_batch(state: &AppState, uploader: &Uploader) -> Result<Arc<Batch>, ActionError> {
@@ -15,7 +15,7 @@ pub fn create_batch(state: &AppState, uploader: &Uploader) -> Result<Arc<Batch>,
         Batch::create(&state.config().data_path, started_at).map_err(ActionError::internal)?,
     );
     let session = state.session();
-    let device = uploader.device();
+    let device = describe_device(&uploader.user_agent);
 
     let mut header = format!("QuickShare {VERSION}\n");
     let _ = writeln!(header, "executable sha256: {}", session.executable_sha256());

@@ -1,5 +1,7 @@
 use std::net::IpAddr;
 
+use crate::libs::http_url::http_url;
+
 const VIRTUAL_INTERFACE_PREFIXES: &[&str] = &["docker", "br-", "veth", "virbr", "vmnet", "vboxnet"];
 
 pub struct NetworkUrl {
@@ -18,7 +20,7 @@ pub fn network_urls(bind: &str, port: u16) -> Vec<NetworkUrl> {
     if !address.is_unspecified() {
         return vec![NetworkUrl {
             interface: String::new(),
-            url: url(address, port),
+            url: http_url(address, port),
         }];
     }
 
@@ -34,7 +36,7 @@ pub fn network_urls(bind: &str, port: u16) -> Vec<NetworkUrl> {
         })
         .map(|(interface, address)| NetworkUrl {
             interface,
-            url: url(address, port),
+            url: http_url(address, port),
         })
         .collect();
 
@@ -42,11 +44,4 @@ pub fn network_urls(bind: &str, port: u16) -> Vec<NetworkUrl> {
     urls.dedup_by(|a, b| a.url == b.url);
 
     urls
-}
-
-fn url(address: IpAddr, port: u16) -> String {
-    match address {
-        IpAddr::V4(address) => format!("http://{address}:{port}/"),
-        IpAddr::V6(address) => format!("http://[{address}]:{port}/"),
-    }
 }

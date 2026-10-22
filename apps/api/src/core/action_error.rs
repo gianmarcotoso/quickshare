@@ -1,4 +1,4 @@
-use std::{borrow::Cow, fmt};
+use std::fmt;
 
 use axum::{
     Json,
@@ -13,14 +13,14 @@ use crate::core::error_code::{ErrorCode, ErrorDto};
 pub enum ActionError {
     LogicViolation(ErrorCode),
     NotFound(ErrorCode),
-    Unauthorized,
     PayloadTooLarge,
-    Internal(Cow<'static, str>),
+    Internal(ErrorDto),
 }
 
 impl ActionError {
-    pub fn internal(error: impl ToString) -> Self {
-        ActionError::Internal(error.to_string().into())
+    pub fn internal(cause: impl fmt::Display) -> Self {
+        tracing::error!(%cause, "internal error");
+        ActionError::Internal(ErrorDto::new(ErrorCode::Internal))
     }
 }
 
@@ -30,9 +30,8 @@ impl fmt::Display for ActionError {
             ActionError::LogicViolation(code) | ActionError::NotFound(code) => {
                 write!(f, "{}", code.as_str())
             }
-            ActionError::Unauthorized => write!(f, "{}", ErrorCode::InvalidToken.as_str()),
             ActionError::PayloadTooLarge => write!(f, "{}", ErrorCode::FileTooLarge.as_str()),
-            ActionError::Internal(error) => write!(f, "{}: {error}", ErrorCode::Internal.as_str()),
+            ActionError::Internal(error) => write!(f, "{}", error.code.as_str()),
         }
     }
 }
@@ -56,23 +55,13 @@ impl IntoResponse for ActionError {
             ActionError::NotFound(code) => {
                 (StatusCode::NOT_FOUND, Json(ErrorDto::new(code))).into_response()
             }
-            ActionError::Unauthorized => (
-                StatusCode::UNAUTHORIZED,
-                Json(ErrorDto::new(ErrorCode::InvalidToken)),
-            )
-                .into_response(),
             ActionError::PayloadTooLarge => (
                 StatusCode::PAYLOAD_TOO_LARGE,
                 Json(ErrorDto::new(ErrorCode::FileTooLarge)),
             )
                 .into_response(),
             ActionError::Internal(error) => {
-                tracing::error!(%error, "internal error");
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    Json(ErrorDto::new(ErrorCode::Internal)),
-                )
-                    .into_response()
+                (StatusCode::INTERNAL_SERVER_ERROR, Json(error)).into_response()
             }
         }
     }

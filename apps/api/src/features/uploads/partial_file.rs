@@ -2,7 +2,7 @@ use std::{path::PathBuf, sync::Arc};
 
 use chrono::Utc;
 
-use crate::{features::uploads::types::batch::Batch, libs::log_timestamp::log_timestamp};
+use crate::{features::uploads::batch::Batch, libs::log_timestamp::log_timestamp};
 
 pub struct PartialFile {
     batch: Arc<Batch>,
@@ -47,7 +47,7 @@ impl Drop for PartialFile {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::features::uploads::types::batch::BATCH_LOG;
+    use crate::features::uploads::constants::BATCH_LOG;
 
     #[test]
     fn a_partial_file_is_deleted_and_noted_unless_kept() {

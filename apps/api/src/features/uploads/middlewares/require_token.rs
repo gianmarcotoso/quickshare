@@ -1,17 +1,21 @@
 use axum::{
+    Json,
     extract::{Request, State},
-    http::header,
+    http::{StatusCode, header},
     middleware::Next,
-    response::Response,
+    response::{IntoResponse, Response},
 };
 
-use crate::{app::state::AppState, core::action_error::ActionError};
+use crate::{
+    app::state::AppState,
+    core::error_code::{ErrorCode, ErrorDto},
+};
 
 pub async fn require_token(
     State(state): State<AppState>,
     request: Request,
     next: Next,
-) -> Result<Response, ActionError> {
+) -> Response {
     let token = request
         .headers()
         .get(header::AUTHORIZATION)
@@ -19,8 +23,12 @@ pub async fn require_token(
         .and_then(|value| value.strip_prefix("Bearer "));
 
     if token != Some(state.session().token()) {
-        return Err(ActionError::Unauthorized);
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(ErrorDto::new(ErrorCode::InvalidToken)),
+        )
+            .into_response();
     }
 
-    Ok(next.run(request).await)
+    next.run(request).await
 }

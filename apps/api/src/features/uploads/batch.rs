@@ -7,10 +7,10 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::libs::sha256_file::sha256_file;
-
-pub const BATCH_FOLDER_FORMAT: &str = "%Y_%m_%d_%H_%M_%S";
-pub const BATCH_LOG: &str = "quickshare.log";
+use crate::{
+    features::uploads::constants::{BATCH_FOLDER_FORMAT, BATCH_LOG},
+    libs::sha256_file::sha256_file,
+};
 
 pub struct Batch {
     id: String,

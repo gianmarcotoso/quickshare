@@ -6,7 +6,7 @@ use std::{
 use chrono::{DateTime, Utc};
 use rand::{RngCore, rngs::OsRng};
 
-use crate::features::uploads::types::batch::Batch;
+use crate::features::uploads::batch::Batch;
 
 const TOKEN_BYTES: usize = 10;
 

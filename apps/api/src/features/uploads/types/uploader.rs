@@ -1,27 +1,30 @@
 use std::net::{IpAddr, SocketAddr};
 
-use axum::http::{HeaderMap, header};
-
-use crate::libs::describe_device::describe_device;
+use axum::{
+    extract::{ConnectInfo, FromRequestParts},
+    http::{header, request::Parts},
+};
 
 pub struct Uploader {
     pub ip: IpAddr,
     pub user_agent: String,
 }
 
-impl Uploader {
-    pub fn from_request(address: SocketAddr, headers: &HeaderMap) -> Self {
-        Self {
+impl<S: Send + Sync> FromRequestParts<S> for Uploader {
+    type Rejection = <ConnectInfo<SocketAddr> as FromRequestParts<S>>::Rejection;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let ConnectInfo(address) =
+            ConnectInfo::<SocketAddr>::from_request_parts(parts, state).await?;
+
+        Ok(Self {
             ip: address.ip().to_canonical(),
-            user_agent: headers
+            user_agent: parts
+                .headers
                 .get(header::USER_AGENT)
                 .and_then(|value| value.to_str().ok())
                 .unwrap_or_default()
                 .to_string(),
-        }
-    }
-
-    pub fn device(&self) -> String {
-        describe_device(&self.user_agent)
+        })
     }
 }
