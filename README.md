@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img alt="Versione" src="https://img.shields.io/badge/versione-0.1.0-2f6fe0">
+  <img alt="Versione" src="https://img.shields.io/badge/versione-0.1.1-2f6fe0">
   <img alt="Rust 2024" src="https://img.shields.io/badge/Rust-2024-b7410e?logo=rust&logoColor=white">
   <img alt="Axum 0.8" src="https://img.shields.io/badge/Axum-0.8-16181d">
   <img alt="React 19" src="https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black">
@@ -55,7 +55,7 @@ quickshare --bind 10.42.0.1            # oppure direttamente, senza toccare il f
 ```
 IP di ascolto: 10.42.0.1 (hotspot quickshare-hotspot)
 Porta 3030/tcp aperta nella zona nm-shared (wlp0s20f3), solo runtime.
-2026-10-13T17:01:12Z  INFO quickshare version="0.1.0 (3f2a9c1d0b7e)" executable_sha256=9ae31d45…
+2026-10-13T17:01:12Z  INFO quickshare version="0.1.1 (3f2a9c1d0b7e)" executable_sha256=9ae31d45…
 2026-10-13T17:01:12Z  INFO session started started=2026-10-13T17:01:12Z (2026-10-13 19:01:12 +02:00) token=b2e92d97ff78fcba8396
 2026-10-13T17:01:12Z  INFO open url=http://10.42.0.1:3030/?t=b2e92d97ff78fcba8396
   ▄▄▄▄▄▄▄ ▄▄  ▄ ▄▄▄▄▄▄▄

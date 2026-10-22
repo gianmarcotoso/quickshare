@@ -72,7 +72,7 @@ data/                              # Storage.DataPath
 `quickshare.log`, testo semplice. Gli orari sono in UTC seguiti dall'ora locale con offset, come nel registro dei casi del kit di estrazione:
 
 ```
-QuickShare 0.1.0 (3f2a9c1d0b7e)
+QuickShare 0.1.1 (3f2a9c1d0b7e)
 executable sha256: 9ae31d457817135390c6bce7ca824167d2dfff41d56ce5923493d28b0617695c
 session started:   2026-10-13T17:01:12Z (2026-10-13 19:01:12 +02:00)
 session token:     b2e92d97ff78fcba8396
@@ -123,7 +123,7 @@ Ctrl+C (o SIGTERM) smette di accettare connessioni e aspetta fino a 5 secondi gl
 ```
 quickshare [--config <path>] [--bind <ip>] [--port <porta>]   # avvia il server
 scripts/serve.sh [stesse opzioni]   # lo avvia aprendo e poi richiudendo la porta su firewalld
-quickshare --version           # versione e commit, es. 0.1.0 (3f2a9c1d0b7e)
+quickshare --version           # versione e commit, es. 0.1.1 (3f2a9c1d0b7e)
 quickshare init                # scrive un config.ini dal template (non sovrascrive)
 quickshare openapi             # stampa lo spec OpenAPI su stdout
 ```
@@ -158,4 +158,4 @@ tar -xzf .tmp/src/build/linux-x86_64/quickshare-*-linux-x86_64.tar.gz -C .tmp
 
 La copia in `.tmp/src` evita che il container, che lavora come root, lasci file di root in `node_modules` e `target` del repository.
 
-**Versione e commit.** `build.rs` legge il commit con `git rev-parse --short=12 HEAD` e aggiunge `-dirty` se `git status --porcelain` non è vuoto (`unknown` fuori da un repository o prima del primo commit); la versione completa (`0.1.0 (3f2a9c1d0b7e)`) è in `--version`, nel terminale, nei registri e nel piè di pagina. Lo script di build ricompila sempre il crate, quindi il commit (e il `-dirty`) di un binario di produzione è sempre esatto; in sviluppo il build script si riesegue solo quando cambiano `.git/HEAD` o `.git/index`. Per un uso in tribunale: binario compilato da un commit pulito, hash dell'eseguibile nel verbale (lo stesso che compare nell'intestazione di ogni registro), sorgente e test disponibili.
+**Versione e commit.** `build.rs` legge il commit con `git rev-parse --short=12 HEAD` e aggiunge `-dirty` se `git status --porcelain` non è vuoto (`unknown` fuori da un repository o prima del primo commit); la versione completa (`0.1.1 (3f2a9c1d0b7e)`) è in `--version`, nel terminale, nei registri e nel piè di pagina. Lo script di build ricompila sempre il crate, quindi il commit (e il `-dirty`) di un binario di produzione è sempre esatto; in sviluppo il build script si riesegue solo quando cambiano `.git/HEAD` o `.git/index`. Per un uso in tribunale: binario compilato da un commit pulito, hash dell'eseguibile nel verbale (lo stesso che compare nell'intestazione di ogni registro), sorgente e test disponibili.
