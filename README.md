@@ -112,6 +112,8 @@ Verifiche: `cargo test` e `cargo clippy --all-targets` in `apps/api`, `npx tsc -
 
 La documentazione tecnica è in [`docs/`](docs/): [architettura](docs/architecture.md), [server](docs/api.md), [pagina](docs/web.md), [storia delle decisioni](docs/ledger.md).
 
+Le novità di ogni versione sono nel [changelog](CHANGELOG.md).
+
 ## Licenza
 
 GPL-3.0: vedi [`LICENSE`](LICENSE).
